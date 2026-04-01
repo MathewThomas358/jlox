@@ -11,9 +11,10 @@ import java.util.List;
 /**
  * Lox Interpreter in Java
  * 
- * Potential Improvements: TODO: Add C-style block comments. <br>
+ * Potential Improvements:<br>
+ * TODO: Add C-style block comments. <br>
  * TODO: Reading user input. <br>
- * TODO: Add more numeric data-types
+ * TODO: Add more numeric data-types <br>
  */
 public class Lox {
 
