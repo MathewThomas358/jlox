@@ -11,8 +11,29 @@ public class GenerateAst {
     public static void main(String[] args) throws IOException {
 	String outputDir = "src/com/jlox/lox/ast/";
 
-	defineAst(outputDir, "Expr", Arrays.asList("Binary   : Expr left, Token operator, Expr right",
-		"Grouping : Expr expression", "Literal  : Object value", "Unary    : Token operator, Expr right"));
+	List<String> types = Arrays.asList("Binary   : Expr left, Token operator, Expr right",
+		"Grouping : Expr expression", "Literal  : Object value", "Unary    : Token operator, Expr right");
+
+	defineBaseClass(outputDir, "Expr", types);
+	defineAst(outputDir, "Expr", types);
+    }
+
+    private static void defineBaseClass(String outputDir, String baseName, List<String> types) throws IOException {
+
+	String path = outputDir + "/" + baseName + ".java";
+
+	File file = new File(path);
+	file.getParentFile().mkdirs();
+
+	try (PrintWriter writer = new PrintWriter(file, "UTF-8")) {
+	    writer.println("package com.jlox.lox.ast;");
+	    writer.println();
+	    writer.println("abstract public class " + baseName + " {");
+	    defineVisitor(writer, baseName, types);
+	    writer.println();
+	    writer.println("  public abstract <R> R accept(Visitor<R> visitor);");
+	    writer.println("}");
+	}
     }
 
     private static void defineAst(String outputDir, String baseName, List<String> types) throws IOException {
@@ -23,7 +44,6 @@ public class GenerateAst {
 
 	    File file = new File(path);
 	    file.getParentFile().mkdirs();
-	    System.out.println(file.getCanonicalPath());
 
 	    try (PrintWriter writer = new PrintWriter(file, "UTF-8")) {
 
@@ -55,10 +75,27 @@ public class GenerateAst {
 
 	writer.println("    }");
 
+	writer.println();
+	writer.println("    @Override");
+	writer.println("    public <R> R accept(Visitor<R> visitor) {");
+	writer.println("      return visitor.visit" + className + baseName + "(this);");
+	writer.println("    }");
+
 	// Fields.
 	writer.println();
 	for (String field : fields) {
 	    writer.println("    final " + field + ";");
 	}
+    }
+
+    private static void defineVisitor(PrintWriter writer, String baseName, List<String> types) {
+	writer.println("  public interface Visitor<R> {");
+
+	for (String type : types) {
+	    String typeName = type.split(":")[0].trim();
+	    writer.println("    R visit" + typeName + baseName + "(" + typeName + " " + baseName.toLowerCase() + ");");
+	}
+
+	writer.println("  }");
     }
 }

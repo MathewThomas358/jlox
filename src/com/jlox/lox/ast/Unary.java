@@ -8,6 +8,11 @@ public class Unary extends Expr{
       this.right = right;
     }
 
+    @Override
+    public <R> R accept(Visitor<R> visitor) {
+      return visitor.visitUnaryExpr(this);
+    }
+
     final Token operator;
     final Expr right;
 }
