@@ -3,7 +3,7 @@ package com.jlox.lox.ast;
 import com.jlox.lox.Token;
 
 public class Literal extends Expr{
-    Literal(Object value) {
+    public Literal(Object value) {
       this.value = value;
     }
 
