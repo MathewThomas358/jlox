@@ -64,7 +64,7 @@ public class GenerateAst {
 
     private static void defineType(PrintWriter writer, String baseName, String className, String fieldList) {
 	// Constructor.
-	writer.println("    " + className + "(" + fieldList + ") {");
+	writer.println("    public " + className + "(" + fieldList + ") {");
 
 	// Store parameters in fields.
 	String[] fields = fieldList.split(", ");

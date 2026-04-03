@@ -4,7 +4,7 @@ import com.jlox.lox.Token;
 import com.jlox.lox.TokenType;
 import com.jlox.lox.ast.Expr.Visitor;
 
-public class AstPrinter implements Visitor<String> {
+class AstPrinter implements Visitor<String> {
 
     private final PrintMode printMode;
 
