@@ -44,11 +44,15 @@ public class AstPrinter implements Visitor<String> {
 	return parenthesize(expr.operator.lexeme, expr.right);
     }
 
+    @Override
+    public String visitTernaryExpr(Ternary expr) {
+	return parenthesize("?:", expr.condition, expr.trueBranch, expr.falseBranch);
+    };
+
     private String parenthesize(String name, Expr... exprs) {
-	switch (printMode) {
-	case RPN:
+	if (printMode == PrintMode.RPN) {
 	    return paranthesizeRpn(name, exprs);
-	default:
+	} else {
 	    return paranthesizeNormal(name, exprs);
 	}
     }
@@ -108,5 +112,5 @@ public class AstPrinter implements Visitor<String> {
 
     public enum PrintMode {
 	NORMAL, RPN
-    };
+    }
 }

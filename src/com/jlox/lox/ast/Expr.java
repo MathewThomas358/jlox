@@ -6,6 +6,7 @@ abstract public class Expr {
     R visitGroupingExpr(Grouping expr);
     R visitLiteralExpr(Literal expr);
     R visitUnaryExpr(Unary expr);
+    R visitTernaryExpr(Ternary expr);
   }
 
   public abstract <R> R accept(Visitor<R> visitor);

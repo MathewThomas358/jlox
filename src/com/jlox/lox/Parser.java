@@ -9,6 +9,7 @@ import com.jlox.lox.ast.Binary;
 import com.jlox.lox.ast.Expr;
 import com.jlox.lox.ast.Grouping;
 import com.jlox.lox.ast.Literal;
+import com.jlox.lox.ast.Ternary;
 import com.jlox.lox.ast.Unary;
 
 /**
@@ -139,7 +140,7 @@ public class Parser {
 		consume(TokenType.COLON, "Missing ternary operator");
 		Expr exprFalse = ternary();
 
-		return new Binary(exprTrue, null, exprFalse); // TODO: add a new Ternary AST Node.
+		return new Ternary(expr, exprTrue, exprFalse);
 	    }
 
 	    return expr;

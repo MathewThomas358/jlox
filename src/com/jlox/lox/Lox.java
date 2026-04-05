@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import com.jlox.lox.ast.AstPrinter;
+import com.jlox.lox.ast.AstPrinter.PrintMode;
 import com.jlox.lox.ast.Expr;
 
 /**
@@ -77,7 +78,7 @@ public class Lox {
 	if (hadError)
 	    return;
 
-	System.out.println(new AstPrinter().print(expression));
+	System.out.println(new AstPrinter(PrintMode.RPN).print(expression));
     }
 
     static void error(int line, String message) {
