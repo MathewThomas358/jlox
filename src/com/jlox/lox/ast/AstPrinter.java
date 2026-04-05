@@ -4,19 +4,19 @@ import com.jlox.lox.Token;
 import com.jlox.lox.TokenType;
 import com.jlox.lox.ast.Expr.Visitor;
 
-class AstPrinter implements Visitor<String> {
+public class AstPrinter implements Visitor<String> {
 
     private final PrintMode printMode;
 
-    AstPrinter() {
+    public AstPrinter() {
 	this.printMode = PrintMode.NORMAL;
     }
 
-    AstPrinter(PrintMode printMode) {
+    public AstPrinter(PrintMode printMode) {
 	this.printMode = printMode;
     }
 
-    String print(Expr expr) {
+    public String print(Expr expr) {
 	return expr.accept(this);
     }
 
@@ -106,7 +106,7 @@ class AstPrinter implements Visitor<String> {
 	System.out.println(new AstPrinter(PrintMode.RPN).print(arithmeticTestExpr));
     }
 
-    enum PrintMode {
+    public enum PrintMode {
 	NORMAL, RPN
     };
 }

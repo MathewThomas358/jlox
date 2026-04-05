@@ -8,13 +8,24 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import com.jlox.lox.ast.AstPrinter;
+import com.jlox.lox.ast.Expr;
+
 /**
  * Lox Interpreter in Java
  * 
+ * Additional Tweaks: <br>
+ * 1. Added a AST Printer option to print in RPN <br>
+ * 2. <br>
+ * <br>
  * Potential Improvements:<br>
  * TODO: Add C-style block comments. <br>
  * TODO: Reading user input. <br>
  * TODO: Add more numeric data-types <br>
+ * TODO: Add LALR parsing support <br>
+ * TODO: Implement the same in Rust <br>
+ * TODO: Implement a LLVM IR <br>
+ * NOSONAR
  */
 public class Lox {
 
@@ -46,8 +57,9 @@ public class Lox {
 	for (;;) {
 	    System.out.print("> ");
 	    String line = reader.readLine();
-	    if (line == null)
+	    if (line == null) {
 		break;
+	    }
 	    run(line);
 	    hadError = false;
 	}
@@ -57,10 +69,15 @@ public class Lox {
 	Scanner scanner = new Scanner(source);
 	List<Token> tokens = scanner.scanTokens();
 
-	// For now, just print the tokens.
-	for (Token token : tokens) {
-	    System.out.println(token);
-	}
+	Parser parser = new Parser(tokens, true, true, true);
+	Expr expression = parser.parse();
+
+	// Stop if there was a syntax error.
+	// TODO: Implement panic mode synchronization
+	if (hadError)
+	    return;
+
+	System.out.println(new AstPrinter().print(expression));
     }
 
     static void error(int line, String message) {
@@ -70,5 +87,13 @@ public class Lox {
     private static void report(int line, String where, String message) {
 	System.err.println("[line " + line + "] Error" + where + ": " + message);
 	hadError = true;
+    }
+
+    static void error(Token token, String message) {
+	if (token.type == TokenType.EOF) {
+	    report(token.line, " at end", message);
+	} else {
+	    report(token.line, " at '" + token.lexeme + "'", message);
+	}
     }
 }
