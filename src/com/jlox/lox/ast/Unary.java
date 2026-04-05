@@ -13,6 +13,6 @@ public class Unary extends Expr{
       return visitor.visitUnaryExpr(this);
     }
 
-    final Token operator;
-    final Expr right;
+    public final Token operator;
+    public final Expr right;
 }

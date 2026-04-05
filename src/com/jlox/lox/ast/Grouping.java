@@ -12,5 +12,5 @@ public class Grouping extends Expr{
       return visitor.visitGroupingExpr(this);
     }
 
-    final Expr expression;
+    public final Expr expression;
 }

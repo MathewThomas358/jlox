@@ -12,5 +12,5 @@ public class Literal extends Expr{
       return visitor.visitLiteralExpr(this);
     }
 
-    final Object value;
+    public final Object value;
 }

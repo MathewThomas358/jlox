@@ -14,7 +14,7 @@ public class Ternary extends Expr{
       return visitor.visitTernaryExpr(this);
     }
 
-    final Expr condition;
-    final Expr trueBranch;
-    final Expr falseBranch;
+    public final Expr condition;
+    public final Expr trueBranch;
+    public final Expr falseBranch;
 }

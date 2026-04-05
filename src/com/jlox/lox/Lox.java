@@ -8,8 +8,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import com.jlox.lox.ast.AstPrinter;
-import com.jlox.lox.ast.AstPrinter.PrintMode;
 import com.jlox.lox.ast.Expr;
 
 /**
@@ -30,7 +28,12 @@ import com.jlox.lox.ast.Expr;
  */
 public class Lox {
 
+    // This is static so that we use the same interpreter when running a REPL
+    // session. Global variables should persist across REPL sessions.
+    private static final Interpreter INTERPRETER = new Interpreter();
+
     static boolean hadError = false;
+    static boolean hadRuntimeError = false;
 
     public static void main(String[] args) throws IOException {
 	if (args.length > 1) {
@@ -46,6 +49,8 @@ public class Lox {
     private static void runFile(String path) throws IOException {
 	if (hadError)
 	    System.exit(65);
+	if (hadRuntimeError)
+	    System.exit(70);
 
 	byte[] bytes = Files.readAllBytes(Paths.get(path));
 	run(new String(bytes, Charset.defaultCharset()));
@@ -73,12 +78,11 @@ public class Lox {
 	Parser parser = new Parser(tokens, true, true, true);
 	Expr expression = parser.parse();
 
-	// Stop if there was a syntax error.
 	// TODO: Implement panic mode synchronization
 	if (hadError)
 	    return;
 
-	System.out.println(new AstPrinter(PrintMode.RPN).print(expression));
+	INTERPRETER.interpret(expression);
     }
 
     static void error(int line, String message) {
@@ -96,5 +100,10 @@ public class Lox {
 	} else {
 	    report(token.line, " at '" + token.lexeme + "'", message);
 	}
+    }
+
+    static void runtimeError(RuntimeError error) {
+	System.err.println(error.getMessage() + "\n[line " + error.token.line + "]");
+	hadRuntimeError = true;
     }
 }
