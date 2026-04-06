@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import com.jlox.lox.ast.Expr;
+import com.jlox.lox.ast.Stmt;
 
 /**
  * Lox Interpreter in Java
@@ -24,7 +24,6 @@ import com.jlox.lox.ast.Expr;
  * TODO: Add LALR parsing support <br>
  * TODO: Implement the same in Rust <br>
  * TODO: Implement a LLVM IR <br>
- * NOSONAR
  */
 public class Lox {
 
@@ -75,14 +74,13 @@ public class Lox {
 	Scanner scanner = new Scanner(source);
 	List<Token> tokens = scanner.scanTokens();
 
-	Parser parser = new Parser(tokens, true, true, true);
-	Expr expression = parser.parse();
+	Parser parser = new Parser(tokens, true, false, true);
+	List<Stmt> statements = parser.parse();
 
-	// TODO: Implement panic mode synchronization
 	if (hadError)
 	    return;
 
-	INTERPRETER.interpret(expression);
+	INTERPRETER.interpret(statements);
     }
 
     static void error(int line, String message) {

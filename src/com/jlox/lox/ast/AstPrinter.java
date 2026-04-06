@@ -47,7 +47,19 @@ public class AstPrinter implements Visitor<String> {
     @Override
     public String visitTernaryExpr(Ternary expr) {
 	return parenthesize("?:", expr.condition, expr.trueBranch, expr.falseBranch);
-    };
+    }
+
+    @Override
+    public String visitVariableExpr(Variable expr) {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+    @Override
+    public String visitAssignExpr(Assign expr) {
+	// TODO Auto-generated method stub
+	return null;
+    }
 
     private String parenthesize(String name, Expr... exprs) {
 	if (printMode == PrintMode.RPN) {

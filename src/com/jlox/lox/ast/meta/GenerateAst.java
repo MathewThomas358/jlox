@@ -11,17 +11,23 @@ public class GenerateAst {
     public static void main(String[] args) throws IOException {
 	String outputDir = "src/com/jlox/lox/ast/";
 
-	List<String> types = Arrays.asList("Binary   : Expr left, Token operator, Expr right",
-		"Grouping : Expr expression", "Literal  : Object value", "Unary    : Token operator, Expr right",
-		"Ternary    : Expr condition, Expr trueBranch, Expr falseBranch");
+	List<String> types = Arrays.asList("Assign   : Token name, Expr value",
+		"Binary   : Expr left, Token operator, Expr right", "Grouping : Expr expression",
+		"Literal  : Object value", "Unary    : Token operator, Expr right",
+		"Ternary    : Expr condition, Expr trueBranch, Expr falseBranch", "Variable : Token name");
 
 	defineBaseClass(outputDir, "Expr", types);
 	defineAst(outputDir, "Expr", types);
+
+	List<String> typesStmt = Arrays.asList("Expression : Expr expression", "Print      : Expr expression",
+		"Var        : Token name, Expr initializer");
+	defineBaseClass(outputDir, "Stmt", typesStmt);
+	defineAst(outputDir, "Stmt", typesStmt);
     }
 
     private static void defineBaseClass(String outputDir, String baseName, List<String> types) throws IOException {
 
-	String path = outputDir + "/" + baseName + ".java";
+	String path = outputDir + "/" + baseName + ".java"; // NOSONAR: coz I'm too lazy to read this from a config
 
 	File file = new File(path);
 	file.getParentFile().mkdirs();
@@ -29,7 +35,7 @@ public class GenerateAst {
 	try (PrintWriter writer = new PrintWriter(file, "UTF-8")) {
 	    writer.println("package com.jlox.lox.ast;");
 	    writer.println();
-	    writer.println("abstract public class " + baseName + " {");
+	    writer.println("public abstract class " + baseName + " {");
 	    defineVisitor(writer, baseName, types);
 	    writer.println();
 	    writer.println("  public abstract <R> R accept(Visitor<R> visitor);");
@@ -41,7 +47,7 @@ public class GenerateAst {
 	for (String type : types) {
 
 	    String className = type.split(":")[0].trim();
-	    String path = outputDir + "/" + className + ".java";
+	    String path = outputDir + "/" + className + ".java"; // NOSONAR
 
 	    File file = new File(path);
 	    file.getParentFile().mkdirs();
@@ -58,7 +64,6 @@ public class GenerateAst {
 		defineType(writer, baseName, className, fields);
 
 		writer.println("}");
-		writer.close();
 	    }
 	}
     }

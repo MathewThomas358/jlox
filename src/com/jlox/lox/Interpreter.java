@@ -1,22 +1,67 @@
 package com.jlox.lox;
 
+import java.util.List;
+
+import com.jlox.lox.ast.Assign;
 import com.jlox.lox.ast.Binary;
 import com.jlox.lox.ast.Expr;
-import com.jlox.lox.ast.Expr.Visitor;
+import com.jlox.lox.ast.Expression;
 import com.jlox.lox.ast.Grouping;
 import com.jlox.lox.ast.Literal;
+import com.jlox.lox.ast.Print;
+import com.jlox.lox.ast.Stmt;
 import com.jlox.lox.ast.Ternary;
 import com.jlox.lox.ast.Unary;
+import com.jlox.lox.ast.Var;
+import com.jlox.lox.ast.Variable;
 
-public class Interpreter implements Visitor<Object> {
+public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
-    public void interpret(Expr expression) {
+    private Environment environment = new Environment();
+
+    public void interpret(List<Stmt> statements) {
 	try {
-	    Object value = evaluate(expression);
-	    System.out.println(stringify(value));
+	    for (Stmt statement : statements) {
+		execute(statement);
+	    }
 	} catch (RuntimeError error) {
 	    Lox.runtimeError(error);
 	}
+    }
+
+    @Override
+    public Void visitExpressionStmt(Expression stmt) {
+	evaluate(stmt.expression);
+	return null;
+    }
+
+    @Override
+    public Void visitPrintStmt(Print stmt) {
+	Object value = evaluate(stmt.expression);
+	System.out.println(stringify(value));
+	return null;
+    }
+
+    @Override
+    public Void visitVarStmt(Var stmt) {
+	Object value = null;
+	if (stmt.initializer != null) {
+	    value = evaluate(stmt.initializer);
+	}
+
+	environment.define(stmt.name.lexeme, value);
+	return null;
+    }
+
+    @Override
+    public String visitAssignExpr(Assign expr) {
+	// TODO Auto-generated method stub
+	return null;
+    }
+
+    @Override
+    public Object visitVariableExpr(Variable expr) {
+	return environment.get(expr.name);
     }
 
     @Override
@@ -108,6 +153,10 @@ public class Interpreter implements Visitor<Object> {
 	return evaluate(expr.falseBranch);
     }
 
+    private void execute(Stmt stmt) {
+	stmt.accept(this);
+    }
+
     private Object evaluate(Expr expr) {
 	return expr.accept(this);
     }
@@ -161,5 +210,4 @@ public class Interpreter implements Visitor<Object> {
 	if (denom instanceof Double doubleDenom && doubleDenom == 0)
 	    throw new RuntimeError(operator, "Division by zero");
     }
-
 }

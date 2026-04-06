@@ -1,5 +1,6 @@
 package com.jlox.lox;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
@@ -7,15 +8,18 @@ import com.jlox.lox.ast.AstPrinter;
 import com.jlox.lox.ast.AstPrinter.PrintMode;
 import com.jlox.lox.ast.Binary;
 import com.jlox.lox.ast.Expr;
+import com.jlox.lox.ast.Expression;
 import com.jlox.lox.ast.Grouping;
 import com.jlox.lox.ast.Literal;
+import com.jlox.lox.ast.Print;
+import com.jlox.lox.ast.Stmt;
 import com.jlox.lox.ast.Ternary;
 import com.jlox.lox.ast.Unary;
+import com.jlox.lox.ast.Var;
+import com.jlox.lox.ast.Variable;
 
 /**
- * TODO: Add support for comma operators, write the grammer and implement
- * parsing <br>
- * TODO: Do the same for ternary operator
+ *
  */
 public class Parser {
 
@@ -79,12 +83,57 @@ public class Parser {
 	this.useTernaryOperator = useTernaryOperator;
     }
 
-    Expr parse() {
+    List<Stmt> parse() {
+	List<Stmt> statements = new ArrayList<>();
+	while (!isAtEnd()) {
+	    statements.add(declaration());
+	}
+
+	return statements;
+    }
+
+    private Stmt declaration() {
 	try {
-	    return expression();
+	    if (match(TokenType.VAR)) {
+		return varDeclaration();
+	    }
+
+	    return statement();
 	} catch (ParseError error) {
+	    synchronize();
 	    return null;
 	}
+    }
+
+    private Stmt varDeclaration() {
+	Token name = consume(TokenType.IDENTIFIER, "Expect variable name.");
+
+	Expr initializer = null;
+	if (match(TokenType.EQUAL)) {
+	    initializer = expression();
+	}
+
+	consume(TokenType.SEMICOLON, "Expect ';' after variable declaration.");
+	return new Var(name, initializer);
+    }
+
+    private Stmt statement() {
+	if (match(TokenType.PRINT))
+	    return printStatement();
+
+	return expressionStatement();
+    }
+
+    private Stmt printStatement() {
+	Expr value = expression();
+	consume(TokenType.SEMICOLON, "Expect ';' after value.");
+	return new Print(value);
+    }
+
+    private Stmt expressionStatement() {
+	Expr expr = expression();
+	consume(TokenType.SEMICOLON, "Expect ';' after expression.");
+	return new Expression(expr);
     }
 
     private Expr expression() {
@@ -237,6 +286,10 @@ public class Parser {
 
 	if (match(TokenType.NUMBER, TokenType.STRING)) {
 	    return new Literal(previous().literal);
+	}
+
+	if (match(TokenType.IDENTIFIER)) {
+	    return new Variable(previous());
 	}
 
 	if (match(TokenType.LEFT_PAREN)) {
