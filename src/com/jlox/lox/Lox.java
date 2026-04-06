@@ -31,6 +31,8 @@ public class Lox {
     // session. Global variables should persist across REPL sessions.
     private static final Interpreter INTERPRETER = new Interpreter();
 
+    public static final boolean IS_NIL_ALLOWED = false;
+
     static boolean hadError = false;
     static boolean hadRuntimeError = false;
 

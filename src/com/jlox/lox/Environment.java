@@ -8,8 +8,10 @@ public class Environment {
     final Environment enclosing;
     private final Map<String, Object> values = new HashMap<>();
 
+    public static final Object UNINITIALIZED = new Object();
+
     Environment() {
-	enclosing = null;
+	this.enclosing = null;
     }
 
     Environment(Environment enclosing) {
@@ -22,7 +24,13 @@ public class Environment {
 
     Object get(Token name) {
 	if (values.containsKey(name.lexeme)) {
-	    return values.get(name.lexeme);
+	    Object value = values.get(name.lexeme);
+
+	    if (!Lox.IS_NIL_ALLOWED && value == UNINITIALIZED) {
+		throw new RuntimeError(name, "Using unitialized varibale not allowed");
+	    }
+
+	    return value;
 	}
 
 	if (enclosing != null)
