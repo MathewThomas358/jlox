@@ -19,8 +19,8 @@ public class GenerateAst {
 	defineBaseClass(outputDir, "Expr", types);
 	defineAst(outputDir, "Expr", types);
 
-	List<String> typesStmt = Arrays.asList("Expression : Expr expression", "Print      : Expr expression",
-		"Var        : Token name, Expr initializer");
+	List<String> typesStmt = Arrays.asList("Block      : List<Stmt> statements", "Expression : Expr expression",
+		"Print      : Expr expression", "Var        : Token name, Expr initializer");
 	defineBaseClass(outputDir, "Stmt", typesStmt);
 	defineAst(outputDir, "Stmt", typesStmt);
     }
@@ -55,6 +55,8 @@ public class GenerateAst {
 	    try (PrintWriter writer = new PrintWriter(file, "UTF-8")) {
 
 		writer.println("package com.jlox.lox.ast;");
+		writer.println();
+		writer.println("import java.util.List;");
 		writer.println();
 		writer.println("import com.jlox.lox.Token;");
 		writer.println();

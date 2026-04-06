@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
+import com.jlox.lox.ast.Assign;
 import com.jlox.lox.ast.AstPrinter;
 import com.jlox.lox.ast.AstPrinter.PrintMode;
 import com.jlox.lox.ast.Binary;
+import com.jlox.lox.ast.Block;
 import com.jlox.lox.ast.Expr;
 import com.jlox.lox.ast.Expression;
 import com.jlox.lox.ast.Grouping;
@@ -121,6 +123,9 @@ public class Parser {
 	if (match(TokenType.PRINT))
 	    return printStatement();
 
+	if (match(TokenType.LEFT_BRACE))
+	    return new Block(block());
+
 	return expressionStatement();
     }
 
@@ -136,14 +141,27 @@ public class Parser {
 	return new Expression(expr);
     }
 
+    private List<Stmt> block() {
+	List<Stmt> statements = new ArrayList<>();
+
+	while (!check(TokenType.RIGHT_BRACE) && !isAtEnd()) {
+	    statements.add(declaration());
+	}
+
+	consume(TokenType.RIGHT_BRACE, "Expect '}' after block.");
+	return statements;
+    }
+
     private Expr expression() {
 	return comma();
     }
 
     private Expr comma() {
 
-	if (useCommaOperator) {
+	// TODO: handle the assignment case, when comma / ternary is enabled
+	// TODO: comma and ternary are incomplete
 
+	if (useCommaOperator) {
 	    /**
 	     * This logic doesn't assign the value of the right most operand to the left
 	     * hand side in case of assignments or give the right hand value as the overall
@@ -175,7 +193,31 @@ public class Parser {
 	    return ternary();
 	}
 
-	return equality();
+	return assignment();
+    }
+
+    private Expr assignment() {
+	// TODO: handle the ternary enabled case
+	// TODO: preferable re-factor the control flow to handle ternary and comma in
+	// this entire file
+
+	Expr expr = equality();
+
+	if (match(TokenType.EQUAL)) {
+	    Token equals = previous();
+	    Expr value = assignment();
+
+	    if (expr instanceof Variable variable) {
+		Token name = variable.name;
+		return new Assign(name, value);
+	    }
+
+	    error(equals, "Invalid assignment target.");
+	}
+
+	return expr;
+
+//	return equality();
     }
 
     private Expr ternary() {

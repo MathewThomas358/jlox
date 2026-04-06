@@ -2,6 +2,7 @@ package com.jlox.lox.ast;
 
 public abstract class Stmt {
   public interface Visitor<R> {
+    R visitBlockStmt(Block stmt);
     R visitExpressionStmt(Expression stmt);
     R visitPrintStmt(Print stmt);
     R visitVarStmt(Var stmt);

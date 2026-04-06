@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.jlox.lox.ast.Assign;
 import com.jlox.lox.ast.Binary;
+import com.jlox.lox.ast.Block;
 import com.jlox.lox.ast.Expr;
 import com.jlox.lox.ast.Expression;
 import com.jlox.lox.ast.Grouping;
@@ -54,9 +55,16 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     @Override
-    public String visitAssignExpr(Assign expr) {
-	// TODO Auto-generated method stub
+    public Void visitBlockStmt(Block stmt) {
+	executeBlock(stmt.statements, new Environment(environment));
 	return null;
+    }
+
+    @Override
+    public Object visitAssignExpr(Assign expr) {
+	Object value = evaluate(expr.value);
+	environment.assign(expr.name, value);
+	return value;
     }
 
     @Override
@@ -159,6 +167,19 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private Object evaluate(Expr expr) {
 	return expr.accept(this);
+    }
+
+    void executeBlock(List<Stmt> statements, Environment environment) {
+	Environment previous = this.environment;
+	try {
+	    this.environment = environment;
+
+	    for (Stmt statement : statements) {
+		execute(statement);
+	    }
+	} finally {
+	    this.environment = previous;
+	}
     }
 
     private String stringify(Object object) {
